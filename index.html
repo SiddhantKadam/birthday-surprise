@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Escape 💖</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    overflow:hidden;
+    color:white;
+    text-align:center;
+}
+
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:-1;
+}
+
+.screen{
+    position:absolute;
+    width:100%;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+
+input{
+    padding:12px;
+    font-size:18px;
+    border-radius:25px;
+    border:none;
+    text-align:center;
+    margin-top:15px;
+}
+
+button{
+    margin-top:15px;
+    padding:10px 25px;
+    border-radius:25px;
+    border:none;
+    font-size:16px;
+    cursor:pointer;
+    background:#ff4e50;
+    color:white;
+}
+
+.big{
+    font-size:55px;
+    animation:float 2s infinite alternate;
+}
+
+@keyframes float{
+    from{transform:translateY(0)}
+    to{transform:translateY(-20px)}
+}
+
+.hint{
+    margin-top:10px;
+    font-size:14px;
+    opacity:0.8;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="screen" id="gameScreen">
+    <h1 id="title" class="big">🌌 Level 1</h1>
+    <p id="message">Among billions of stars, I found you 💫</p>
+    <div class="hint" id="hint">Hint: Where do stars live?</div>
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="checkPassword()">Unlock ❤️</button>
+</div>
+
+<script>
+const levels = [
+    {
+        title:"🌌 My Love",
+        message:"Happy Birthday, my love. You are the most beautiful part of my life and my greatest blessing. 💖",
+        hint:"Hint: What is your nickname?",
+        password:"gundi",
+        background:"galaxy"
+    },
+    {
+        title:"🌊 Mi amor",
+        message:"Every moment with you feels special, but today is extra special because it’s the day you were born. 🎂",
+        hint:"Hint: What is the first gift I gave you?",
+        password:"watch",
+        background:"ocean"
+    },
+    {
+        title:"🔥 Mon amour",
+        message:"May your smile shine brighter than ever and your heart always stay as pure and beautiful as it is. 🌸",
+        hint:"Hint: Where did we meet, after we got engaged?",
+        password:"chate",
+        background:"fire"
+    },
+    {
+        title:"🌸 Amore Mio",
+        message:"I’m so lucky to call you mine, loving you is the best thing that ever happened to me. ❤️",
+        hint:"Hint: Is this your last birthday as an unmarried?",
+        password:"yes",
+        background:"pink"
+    },
+    {
+        title:"👑 Nae Sarang",
+        message:"No matter what the future holds, I promise to celebrate you, support you, and love you every single day. 💕",
+        hint:"Hint: Who rules my heart?",
+        password:"praju",
+        background:"royal"
+    }
+];
+
+let currentLevel = 0;
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function loadLevel(){
+    const level = levels[currentLevel];
+    document.getElementById("title").innerText = level.title;
+    document.getElementById("message").innerText = level.message;
+    document.getElementById("hint").innerText = level.hint;
+    document.getElementById("password").value = "";
+    applyBackground(level.background);
+}
+
+function checkPassword(){
+    const input = document.getElementById("password").value.toLowerCase();
+    if(input === levels[currentLevel].password){
+        currentLevel++;
+        if(currentLevel < levels.length){
+            loadLevel();
+        }else {
+
+    document.body.innerHTML = "";
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
+    document.body.style.background = "black";
+
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    function resize(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    let hearts = [];
+    for(let i=0;i<40;i++){
+        hearts.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            size: Math.random()*20+10,
+            speed: Math.random()*0.5+0.2,
+            alpha: Math.random()*0.5+0.3
+        });
+    }
+
+    let pulse = 0;
+
+    function animate(){
+
+        ctx.fillStyle = "rgba(10,0,20,0.4)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        // Floating hearts background
+        hearts.forEach(h=>{
+            ctx.globalAlpha = h.alpha;
+            ctx.font = h.size + "px Arial";
+            ctx.fillStyle = "#ff4d6d";
+            ctx.fillText("❤️", h.x, h.y);
+
+            h.y -= h.speed;
+            if(h.y < -20){
+                h.y = canvas.height + 20;
+                h.x = Math.random()*canvas.width;
+            }
+        });
+
+        ctx.globalAlpha = 1;
+
+        // Pulsing glow circle behind text
+        pulse += 0.02;
+        let radius = 150 + Math.sin(pulse)*20;
+
+        let glow = ctx.createRadialGradient(
+            canvas.width/2, canvas.height/2,
+            0,
+            canvas.width/2, canvas.height/2,
+            radius
+        );
+        glow.addColorStop(0,"rgba(255,0,100,0.4)");
+        glow.addColorStop(1,"rgba(0,0,0,0)");
+
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, radius, 0, Math.PI*2);
+        ctx.fill();
+
+        // Responsive text
+        let fontSize = canvas.width * 0.06;
+        if(fontSize > 60) fontSize = 60;
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(255,0,100,0.8)";
+        ctx.shadowBlur = 25;
+
+        ctx.fillStyle = "white";
+        ctx.font = "bold " + fontSize + "px Arial";
+        ctx.fillText("Happy Birthday Praju 🎂", canvas.width/2, canvas.height/2 - fontSize/2);
+
+        ctx.font = "bold " + (fontSize*0.7) + "px Arial";
+        ctx.fillText("stay happy always ❤️", canvas.width/2, canvas.height/2 + fontSize/1.5);
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+    }else{
+        alert("What are you doing Gunduli ?  Try again 🤗");
+    }
+}
+
+let animationId;
+
+function applyBackground(type){
+    cancelAnimationFrame(animationId);
+    if(type==="galaxy") galaxy();
+    if(type==="ocean") ocean();
+    if(type==="fire") fire();
+    if(type==="pink") pink();
+    if(type==="royal") royal();
+}
+
+function galaxy(){
+    let stars = Array(200).fill().map(()=>({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        s:Math.random()*2
+    }));
+    function animate(){
+        ctx.fillStyle="black";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle="white";
+        stars.forEach(star=>{
+            ctx.beginPath();
+            ctx.arc(star.x,star.y,star.s,0,Math.PI*2);
+            ctx.fill();
+            star.y+=0.5;
+            if(star.y>canvas.height) star.y=0;
+        });
+        animationId=requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function ocean(){
+
+    let bubbles = [];
+
+    for(let i=0;i<80;i++){
+        bubbles.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            r: Math.random()*6+2,
+            speed: Math.random()*1+0.5,
+            drift: Math.random()*1-0.5
+        });
+    }
+
+    function animate(){
+
+        // Ocean gradient background
+        let gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+        gradient.addColorStop(0,"#021B79");
+        gradient.addColorStop(1,"#0575E6");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        bubbles.forEach(b => {
+
+            ctx.beginPath();
+            ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.fill();
+
+            // Move bubble upward
+            b.y -= b.speed;
+            b.x += b.drift;
+
+            // Reset bubble when it reaches top
+            if(b.y < -10){
+                b.y = canvas.height + 10;
+                b.x = Math.random()*canvas.width;
+            }
+        });
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+function fire(){
+
+    let flames = [];
+
+    for(let i = 0; i < 150; i++){
+        flames.push({
+            x: canvas.width/2,
+            y: canvas.height,
+            size: Math.random()*20 + 10,
+            speed: Math.random()*2 + 1,
+            angle: Math.random()*Math.PI*2,
+            life: Math.random()*100
+        });
+    }
+
+    function animate(){
+
+        // Dark background with smooth fading
+        ctx.fillStyle = "rgba(0,0,0,0.15)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        flames.forEach(f => {
+
+            // Flame width expands as it rises
+            let spread = (canvas.height - f.y) * 0.25;
+
+            let x = canvas.width/2 + Math.sin(f.angle) * spread;
+            let y = f.y;
+
+            // Color transition by height
+            let gradient = ctx.createRadialGradient(
+                x, y, 0,
+                x, y, f.size
+            );
+
+            gradient.addColorStop(0, "rgba(255,255,200,0.9)");
+            gradient.addColorStop(0.3, "rgba(255,180,0,0.8)");
+            gradient.addColorStop(0.6, "rgba(255,80,0,0.6)");
+            gradient.addColorStop(1, "rgba(150,0,0,0)");
+
+            ctx.fillStyle = gradient;
+
+            ctx.beginPath();
+            ctx.arc(x, y, f.size, 0, Math.PI*2);
+            ctx.fill();
+
+            // Move upward
+            f.y -= f.speed;
+            f.angle += 0.05;
+
+            // Reset when too high
+            if(f.y < canvas.height - 400){
+                f.y = canvas.height;
+                f.size = Math.random()*20 + 10;
+                f.angle = Math.random()*Math.PI*2;
+            }
+        });
+
+        // Add base glow
+        let baseGlow = ctx.createRadialGradient(
+            canvas.width/2, canvas.height,
+            10,
+            canvas.width/2, canvas.height,
+            200
+        );
+
+        baseGlow.addColorStop(0, "rgba(255,140,0,0.6)");
+        baseGlow.addColorStop(1, "rgba(0,0,0,0)");
+
+        ctx.fillStyle = baseGlow;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+function pink(){
+
+    let hearts = [];
+
+    for(let i = 0; i < 60; i++){
+        hearts.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 20 + 15,
+            speed: Math.random() * 1 + 0.5,
+            drift: Math.random() * 1 - 0.5,
+            alpha: Math.random() * 0.5 + 0.5
+        });
+    }
+
+    function animate(){
+
+        // Soft romantic gradient background
+        let gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+        gradient.addColorStop(0, "#ff9a9e");
+        gradient.addColorStop(1, "#fad0c4");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        hearts.forEach(h => {
+
+            ctx.globalAlpha = h.alpha;
+            ctx.font = h.size + "px Arial";
+            ctx.fillStyle = "white";
+            ctx.fillText("❤", h.x, h.y);
+
+            // Floating upward
+            h.y -= h.speed;
+            h.x += h.drift;
+
+            // Reset when off screen
+            if(h.y < -20){
+                h.y = canvas.height + 20;
+                h.x = Math.random() * canvas.width;
+            }
+        });
+
+        ctx.globalAlpha = 1;
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+function royal(){
+
+    let particles = [];
+
+    for(let i = 0; i < 120; i++){
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speed: Math.random() * 0.5 + 0.2,
+            alpha: Math.random(),
+            twinkle: Math.random() * 0.02 + 0.01
+        });
+    }
+
+    function animate(){
+
+        // Deep royal gradient background
+        let gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+        gradient.addColorStop(0, "#0f0c29");
+        gradient.addColorStop(0.5, "#302b63");
+        gradient.addColorStop(1, "#24243e");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        particles.forEach(p => {
+
+            // Twinkle effect
+            p.alpha += p.twinkle;
+            if(p.alpha > 1 || p.alpha < 0){
+                p.twinkle *= -1;
+            }
+
+            ctx.globalAlpha = p.alpha;
+
+            // Gold glow
+            let glow = ctx.createRadialGradient(
+                p.x, p.y, 0,
+                p.x, p.y, p.size * 4
+            );
+            glow.addColorStop(0, "rgba(255,215,0,1)");
+            glow.addColorStop(1, "rgba(255,215,0,0)");
+
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI*2);
+            ctx.fill();
+
+            // Slow floating upward
+            p.y -= p.speed;
+            if(p.y < 0){
+                p.y = canvas.height;
+                p.x = Math.random() * canvas.width;
+            }
+        });
+
+        ctx.globalAlpha = 1;
+
+        // Center royal glow (like spotlight)
+        let centerGlow = ctx.createRadialGradient(
+            canvas.width/2, canvas.height/2, 50,
+            canvas.width/2, canvas.height/2, 300
+        );
+        centerGlow.addColorStop(0, "rgba(255,215,0,0.15)");
+        centerGlow.addColorStop(1, "rgba(0,0,0,0)");
+
+        ctx.fillStyle = centerGlow;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+loadLevel();
+</script>
+
+</body>
+</html>
